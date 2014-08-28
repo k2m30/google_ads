@@ -22,6 +22,11 @@ gem 'whenever', :require => false
 gem 'watir-webdriver'
 gem 'headless'
 
+group :development do
+  gem 'better_errors'
+  gem 'binding_of_caller'
+end
+
 gem 'thin'
 # Use ActiveModel has_secure_password
 # gem 'bcrypt', '~> 3.1.7'

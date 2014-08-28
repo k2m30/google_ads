@@ -4,30 +4,41 @@ class AdsController < ApplicationController
   before_action :set_ad, only: [:show, :edit, :update, :destroy]
 
   def refresh
-    require 'headless'
-    headless = Headless.new
-    headless.start
-    @ads = Ad.all
-
-    Country.all.each do |country|
-      profile = Selenium::WebDriver::Firefox::Profile.new
-      profile.proxy = Selenium::WebDriver::Proxy.new socks: country.proxy
-      b = Watir::Browser.new :ff, profile: profile
-
-      b.goto 'google.com'
-      country.ads.each do |ad|
-        b.text_field(name: 'q').set ad.body
-        b.send_keys :enter
-        b.link(id: 'pnnext').wait_until_present
-        target_text = 'intellectsoft'
-        result = b.div(id: 'tads').text.include?(target_text) || b.div(id: 'mbEnd').text.include?(target_text)
-        seo = b.div(id: 'res').text.include?(target_text)
-
-        ad.update(passed: result, seo: seo)
-      end
-      b.close
+    if ENV['HEADLESS']
+      require 'headless'
+      headless = Headless.new
+      headless.start
     end
-    headless.destroy
+    @ads = Ad.all
+    begin
+      Country.all.each do |country|
+        # profile = Selenium::WebDriver::Firefox::Profile.new
+        # profile.proxy = Selenium::WebDriver::Proxy.new socks: country.proxy
+        # b = Watir::Browser.new :ff, profile: profile
+        begin
+          switches = ["--proxy-server=\"socks5://#{country.proxy}\""]
+          b = Watir::Browser.new :chrome, switches: switches
+
+          b.goto 'google.com'
+          country.ads.each do |ad|
+            b.text_field(name: 'q').set ad.body
+            b.send_keys :enter
+            b.link(id: 'pnnext').wait_until_present
+            target_text = 'intellectsoft'
+            result = (b.div(id: 'tads').present? && b.div(id: 'tads').text.include?(target_text)) || (b.div(id: 'mbEnd').present? && b.div(id: 'mbEnd').text.include?(target_text))
+            seo = b.div(id: 'res').text.include?(target_text)
+
+            ad.update(passed: result, seo: seo)
+          end
+        # ensure
+          b.close
+        end
+      end
+    ensure
+      if ENV['HEADLESS']
+        headless.destroy
+      end
+    end
 
     render :status
   end
