@@ -1,0 +1,13 @@
+= form_for @ad, html: { class: "form form-horizontal ad" } do |f|
+  .form-group
+    = f.label :body, class: 'control-label'
+    .controls
+      = f.text_field :body, class: 'form-control', required: true
+    = error_span(@ad[:body])
+  .form-group
+    = f.label :country_id, class: 'control-label'
+    .controls
+      = f.text_field :country_id, class: 'form-control', required: true
+    = error_span(@ad[:country_id])
+  = f.submit nil,class: 'btn btn-primary'
+  = link_to t('.cancel', :default => t("helpers.links.cancel")), ads_path, :class => 'btn btn-default'
