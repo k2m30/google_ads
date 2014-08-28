@@ -1,6 +1,7 @@
 Rails.application.routes.draw do
-  root 'ads#index'
+  root 'ads#status'
 
+  get 'refresh' => 'ads#refresh'
   resources :countries
 
   resources :ads

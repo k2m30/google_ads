@@ -1,0 +1,9 @@
+%style
+  body{background-color: #333333;}
+-@ads.each do |ad|
+  -if ad.passed? || ad.seo?
+    .passed
+      =render partial:'ads/row', locals: {ad: ad}
+  -else
+    .failed
+      =render partial:'ads/row', locals: {ad: ad}

@@ -8,11 +8,11 @@
 
 Country.destroy_all
 
-Country.create(name: 'UK')
-Country.create(name: 'USA')
+Country.create(name: 'UK', proxy: '109.233.115.238:27463')
+Country.create(name: 'USA', proxy: '209.239.112.95:2589')
 
 Country.all.each do |country|
-  ['ios app makers', 'ios app makers in uk'].each do |query|
+  ['ios app makers', "ios app makers in #{country.name}"].each do |query|
     Ad.create(body: query, country: country)
   end
 end

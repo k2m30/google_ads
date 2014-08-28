@@ -1,5 +1,35 @@
+require 'watir-webdriver'
+
 class AdsController < ApplicationController
   before_action :set_ad, only: [:show, :edit, :update, :destroy]
+
+  def refresh
+    @ads = Ad.all
+
+    Country.all.each do |country|
+      profile = Selenium::WebDriver::Firefox::Profile.new
+      profile.proxy = Selenium::WebDriver::Proxy.new socks: country.proxy
+      b = Watir::Browser.new :ff, profile: profile
+
+      b.goto 'google.com'
+      country.ads.each do |ad|
+        b.text_field(name: 'q').set ad.body
+        b.send_keys :enter
+        b.link(id: 'pnnext').wait_until_present
+        target_text = 'intellectsoft'
+        result = b.div(id: 'tads').text.include?(target_text) || b.div(id: 'mbEnd').text.include?(target_text)
+        seo = b.div(id: 'res').text.include?(target_text)
+
+        ad.update(passed: result, seo: seo)
+      end
+      b.close
+    end
+    render :status
+  end
+
+  def status
+    @ads = Ad.all
+  end
 
   # GET /ads
   # GET /ads.json
@@ -62,13 +92,30 @@ class AdsController < ApplicationController
   end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_ad
-      @ad = Ad.find(params[:id])
-    end
+  # Use callbacks to share common setup or constraints between actions.
+  def set_ad
+    @ad = Ad.find(params[:id])
+  end
 
-    # Never trust parameters from the scary internet, only allow the white list through.
-    def ad_params
-      params.require(:ad).permit(:body)
+  # Never trust parameters from the scary internet, only allow the white list through.
+  def ad_params
+    params.require(:ad).permit(:body)
+  end
+
+  def ask_google(proxy, queries)
+    profile = Selenium::WebDriver::Firefox::Profile.new
+    profile.proxy = Selenium::WebDriver::Proxy.new socks: proxy
+    b = Watir::Browser.new :ff, profile: profile
+
+    b.goto 'google.com'
+    queries.each do |query|
+      b.text_field(name: 'q').set query
+      b.send_keys :enter
+      b.link(id: 'pnnext').wait_until_present
+      result = b.text.include? 'intellectsoft.co.uk'
+      p query << ' : ' << result.to_s
     end
+    # b.close
+  end
+
 end
