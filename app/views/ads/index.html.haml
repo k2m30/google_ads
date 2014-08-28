@@ -7,6 +7,7 @@
       %th= model_class.human_attribute_name(:id)
       %th= model_class.human_attribute_name(:body)
       %th= model_class.human_attribute_name(:country_id)
+      %th= model_class.human_attribute_name(:passed)
       %th= model_class.human_attribute_name(:created_at)
       %th=t '.actions', :default => t("helpers.actions")
   %tbody
@@ -15,6 +16,7 @@
         %td= link_to ad.id, ad_path(ad)
         %td= ad.body
         %td= ad.country_id
+        %td= ad.passed
         %td=l ad.created_at
         %td
           = link_to t('.edit', :default => t("helpers.links.edit")), edit_ad_path(ad), :class => 'btn btn-default btn-xs'

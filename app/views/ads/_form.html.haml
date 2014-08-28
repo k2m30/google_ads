@@ -9,5 +9,10 @@
     .controls
       = f.text_field :country_id, class: 'form-control', required: true
     = error_span(@ad[:country_id])
+  .form-group
+    = f.label :passed, class: 'control-label'
+    .controls
+      = f.text_field :passed, class: 'form-control', required: true
+    = error_span(@ad[:passed])
   = f.submit nil,class: 'btn btn-primary'
   = link_to t('.cancel', :default => t("helpers.links.cancel")), ads_path, :class => 'btn btn-default'
