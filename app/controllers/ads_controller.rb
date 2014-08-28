@@ -4,6 +4,9 @@ class AdsController < ApplicationController
   before_action :set_ad, only: [:show, :edit, :update, :destroy]
 
   def refresh
+    require 'headless'
+    headless = Headless.new
+    headless.start
     @ads = Ad.all
 
     Country.all.each do |country|
@@ -24,6 +27,8 @@ class AdsController < ApplicationController
       end
       b.close
     end
+    headless.destroy
+
     render :status
   end
 
