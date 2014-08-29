@@ -12,13 +12,15 @@ class AdsController < ApplicationController
     @ads = Ad.all
     begin
       Country.all.each do |country|
-        # profile = Selenium::WebDriver::Firefox::Profile.new
-        # profile.proxy = Selenium::WebDriver::Proxy.new socks: country.proxy
-        # b = Watir::Browser.new :ff, profile: profile
         begin
-          switches = ["--proxy-server=\"socks5://#{country.proxy}\""]
-          b = Watir::Browser.new :chrome, switches: switches
-
+          if ENV['BROWSER'] == 'firefox'
+            profile = Selenium::WebDriver::Firefox::Profile.new
+            profile.proxy = Selenium::WebDriver::Proxy.new socks: country.proxy
+            b = Watir::Browser.new :ff, profile: profile
+          else
+            switches = ["--proxy-server=\"socks5://#{country.proxy}\""]
+            b = Watir::Browser.new :chrome, switches: switches
+          end
           b.goto 'google.com'
           country.ads.each do |ad|
             b.text_field(name: 'q').set ad.body
@@ -30,7 +32,7 @@ class AdsController < ApplicationController
 
             ad.update(passed: result, seo: seo)
           end
-        # ensure
+          # ensure
           b.close
         end
       end
