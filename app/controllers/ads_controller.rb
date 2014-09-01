@@ -13,7 +13,7 @@ class AdsController < ApplicationController
     begin
       Country.all.each do |country|
         begin
-          if ENV['BROWSER'] == 'firefox'
+          if ENV['BROWSER'].nil? || ENV['BROWSER'] == 'firefox'
             profile = Selenium::WebDriver::Firefox::Profile.new
             profile.proxy = Selenium::WebDriver::Proxy.new socks: country.proxy
             b = Watir::Browser.new :ff, profile: profile
@@ -29,8 +29,9 @@ class AdsController < ApplicationController
             target_text = 'intellectsoft'
             result = (b.div(id: 'tads').present? && b.div(id: 'tads').text.include?(target_text)) || (b.div(id: 'mbEnd').present? && b.div(id: 'mbEnd').text.include?(target_text))
             seo = b.div(id: 'res').text.include?(target_text)
-
-            ad.update(passed: result, seo: seo) if ad.changed?
+            ad.passed = result
+            ad.seo = seo
+            ad.save if ad.changed?
           end
         ensure
           b.close
