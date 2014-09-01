@@ -30,9 +30,9 @@ class AdsController < ApplicationController
             result = (b.div(id: 'tads').present? && b.div(id: 'tads').text.include?(target_text)) || (b.div(id: 'mbEnd').present? && b.div(id: 'mbEnd').text.include?(target_text))
             seo = b.div(id: 'res').text.include?(target_text)
 
-            ad.update(passed: result, seo: seo)
+            ad.update(passed: result, seo: seo) if ad.changed?
           end
-          # ensure
+        ensure
           b.close
         end
       end
@@ -46,7 +46,7 @@ class AdsController < ApplicationController
   end
 
   def status
-    @ads = Ad.all
+    @ads = Ad.all.includes(:country).order(:passed, :body).sort_by{|ad| ad.country.name}
   end
 
   # GET /ads

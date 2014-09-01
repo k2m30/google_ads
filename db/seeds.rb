@@ -1,7 +1,7 @@
 Country.destroy_all
 
 Country.create(name: 'UK', proxy: '109.233.115.238:27463')
-Country.create(name: 'USA', proxy: '209.239.112.95:2589')
+Country.create(name: 'USA', proxy: '192.241.158.23:1080')
 
 queries = ['ios app makers',
          'ios app makers in UK',
