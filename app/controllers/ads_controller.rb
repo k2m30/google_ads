@@ -46,7 +46,7 @@ class AdsController < ApplicationController
   end
 
   def status
-    @ads = Ad.all.includes(:country).order(:passed, :body).sort_by{|ad| ad.country.name}
+    @ads = Ad.all.includes(:country).order('country_id', :body)
   end
 
   # GET /ads
