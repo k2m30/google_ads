@@ -12,18 +12,18 @@ class Country < ActiveRecord::Base
       end
       Country.all.each do |country|
         begin
-          if ENV['BROWSER'].nil? || ENV['BROWSER'] == 'firefox'
-            profile = Selenium::WebDriver::Firefox::Profile.new
-            profile.proxy = Selenium::WebDriver::Proxy.new socks: country.proxy
-            b = Watir::Browser.new :ff, profile: profile
-          else
-            switches = ["--proxy-server=\"socks5://#{country.proxy}\""]
-            b = Watir::Browser.new :chrome, switches: switches
-          end
+          # if ENV['BROWSER'].nil? || ENV['BROWSER'] == 'firefox'
+          profile = Selenium::WebDriver::Firefox::Profile.new
+          profile.proxy = Selenium::WebDriver::Proxy.new socks: country.proxy
+          b = Watir::Browser.new :ff, profile: profile
+          # else
+          #   switches = ["--proxy-server=\"socks5://#{country.proxy}\""]
+          #   b = Watir::Browser.new :chrome, switches: switches
+          # end
           b.goto 'google.com'
           country.ads.each { |ad| ad.check(b) }
         ensure
-          b.close
+          b.close if b.present?
         end
       end
     ensure
