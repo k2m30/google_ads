@@ -4,7 +4,7 @@ class Country < ActiveRecord::Base
 
   def self.refresh
     begin
-      if ENV['HEADLESS']
+      unless ENV['HEADLESS'].nil?
         require 'headless'
         headless = Headless.new
         headless.start

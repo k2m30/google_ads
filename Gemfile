@@ -19,6 +19,7 @@ gem 'spring', group: :development
 gem 'haml'
 gem 'haml-rails'
 gem 'whenever', :require => false
+gem 'selenium-webdriver'
 gem 'watir-webdriver'
 gem 'headless'
 
