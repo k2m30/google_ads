@@ -22,6 +22,7 @@ class Country < ActiveRecord::Base
           #   b = Watir::Browser.new :chrome, switches: switches
           # end
           b.goto 'google.com'
+          logger.fatal('google visited')
           country.ads.each { |ad| ad.check(b) }
         ensure
           b.close if b.present?
