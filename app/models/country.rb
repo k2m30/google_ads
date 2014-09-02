@@ -24,7 +24,7 @@ class Country < ActiveRecord::Base
           b.goto 'google.com'
           logger.fatal('google visited')
           country.ads.each { |ad| ad.check(b) }
-        ensure
+        # ensure
           b.close if b.present?
         end
       end
