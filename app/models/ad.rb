@@ -8,8 +8,9 @@ class Ad < ActiveRecord::Base
     target_text = 'intellectsoft'
     result = (browser.div(id: 'tads').present? && browser.div(id: 'tads').text.include?(target_text)) || (browser.div(id: 'mbEnd').present? && browser.div(id: 'mbEnd').text.include?(target_text))
     seo = browser.div(id: 'res').text.include?(target_text)
-
-    update(passed: result, seo: seo) if changed?
+    self.passed = result
+    self.seo = seo
+    save if changed?
 
   end
 end

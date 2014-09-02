@@ -2,52 +2,14 @@ require 'watir-webdriver'
 
 class AdsController < ApplicationController
   before_action :set_ad, only: [:show, :edit, :update, :destroy]
+  before_action :set_sorted_ads, only: [:status, :refresh]
 
   def refresh
-    if ENV['HEADLESS']
-      require 'headless'
-      headless = Headless.new
-      headless.start
-    end
-    @ads = Ad.all
-    begin
-      Country.all.each do |country|
-        begin
-          if ENV['BROWSER'].nil? || ENV['BROWSER'] == 'firefox'
-            profile = Selenium::WebDriver::Firefox::Profile.new
-            profile.proxy = Selenium::WebDriver::Proxy.new socks: country.proxy
-            b = Watir::Browser.new :ff, profile: profile
-          else
-            switches = ["--proxy-server=\"socks5://#{country.proxy}\""]
-            b = Watir::Browser.new :chrome, switches: switches
-          end
-          b.goto 'google.com'
-          country.ads.each do |ad|
-            b.text_field(name: 'q').set ad.body
-            b.send_keys :enter
-            b.link(id: 'pnnext').wait_until_present
-            target_text = 'intellectsoft'
-            result = (b.div(id: 'tads').present? && b.div(id: 'tads').text.include?(target_text)) || (b.div(id: 'mbEnd').present? && b.div(id: 'mbEnd').text.include?(target_text))
-            seo = b.div(id: 'res').text.include?(target_text)
-            ad.passed = result
-            ad.seo = seo
-            ad.save if ad.changed?
-          end
-        ensure
-          b.close
-        end
-      end
-    ensure
-      if ENV['HEADLESS']
-        headless.destroy
-      end
-    end
-
+    Country.refresh
     render :status
   end
 
   def status
-    @ads = Ad.all.includes(:country).order('country_id', :body)
   end
 
   # GET /ads
@@ -121,20 +83,7 @@ class AdsController < ApplicationController
     params.require(:ad).permit(:body)
   end
 
-  def ask_google(proxy, queries)
-    profile = Selenium::WebDriver::Firefox::Profile.new
-    profile.proxy = Selenium::WebDriver::Proxy.new socks: proxy
-    b = Watir::Browser.new :ff, profile: profile
-
-    b.goto 'google.com'
-    queries.each do |query|
-      b.text_field(name: 'q').set query
-      b.send_keys :enter
-      b.link(id: 'pnnext').wait_until_present
-      result = b.text.include? 'intellectsoft.co.uk'
-      p query << ' : ' << result.to_s
-    end
-    # b.close
+  def set_sorted_ads
+    @ads = Ad.all.includes(:country).order('country_id', :body)
   end
-
 end

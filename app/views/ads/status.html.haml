@@ -1,5 +1,7 @@
 %style
-  body{background-color: #333333;}
+  body{background-color: #333333; color: #aaaaaa;}
+Last updated:
+=Ad.all.order(updated_at: :asc).last.updated_at.to_formatted_s(:short)
 -@ads.each do |ad|
   -if ad.passed? || ad.seo?
     .passed

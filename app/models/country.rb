@@ -1,4 +1,35 @@
 class Country < ActiveRecord::Base
   has_many :ads, dependent: :destroy
   validates :name, presence: true, uniqueness: true
+
+  def self.refresh
+    begin
+      if ENV['HEADLESS']
+        require 'headless'
+        headless = Headless.new
+        headless.start
+      end
+      Country.all.each do |country|
+        begin
+          if ENV['BROWSER'].nil? || ENV['BROWSER'] == 'firefox'
+            profile = Selenium::WebDriver::Firefox::Profile.new
+            profile.proxy = Selenium::WebDriver::Proxy.new socks: country.proxy
+            b = Watir::Browser.new :ff, profile: profile
+          else
+            switches = ["--proxy-server=\"socks5://#{country.proxy}\""]
+            b = Watir::Browser.new :chrome, switches: switches
+          end
+          b.goto 'google.com'
+          country.ads.each { |ad| ad.check(b) }
+        ensure
+          b.close
+        end
+      end
+    ensure
+      if ENV['HEADLESS']
+        headless.destroy
+      end
+    end
+
+  end
 end
