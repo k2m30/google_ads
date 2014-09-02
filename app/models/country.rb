@@ -8,6 +8,7 @@ class Country < ActiveRecord::Base
         require 'headless'
         headless = Headless.new
         headless.start
+        logger.fatal('headless started')
       end
       Country.all.each do |country|
         begin
