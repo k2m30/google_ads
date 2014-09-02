@@ -16,6 +16,7 @@ class Country < ActiveRecord::Base
           profile = Selenium::WebDriver::Firefox::Profile.new
           profile.proxy = Selenium::WebDriver::Proxy.new socks: country.proxy
           b = Watir::Browser.new :ff, profile: profile
+          logger.fatal('firefox started')
           # else
           #   switches = ["--proxy-server=\"socks5://#{country.proxy}\""]
           #   b = Watir::Browser.new :chrome, switches: switches
